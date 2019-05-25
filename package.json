@@ -1,0 +1,31 @@
+{
+  "name": "node-easy-jsonrpc'",
+  "version": "1.0.0",
+  "description": "兼容http和websocket的jsonrpc库",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liuliuabc/node-easy-jsonrpc.git"
+  },
+  "keywords": [
+    "jsonrpc",
+    "websocket-jsonrpc",
+    "nodejs-jsonrpc",
+    "http-jsonrpc"
+  ],
+  "author": "liuliuabc",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/liuliuabc/node-easy-jsonrpc/issues"
+  },
+  "homepage": "https://github.com/liuliuabc/node-easy-jsonrpc#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^10.12.10",
+    "typescript": "^3.3.3333"
+  }
+}
