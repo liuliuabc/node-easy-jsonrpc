@@ -39,21 +39,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var RpcResponse_1 = __importDefault(require("./RpcResponse"));
-var RpcRequest_1 = __importDefault(require("./RpcRequest"));
 var RpcInfo_1 = __importDefault(require("./RpcInfo"));
-var ActionController_1 = __importDefault(require("../ActionController"));
+var RpcController_1 = __importDefault(require("./RpcController"));
 var RpcError_1 = __importDefault(require("./RpcError"));
 var RpcUser = /** @class */ (function () {
-    function RpcUser(sendFun) {
+    function RpcUser() {
+        this.requestMethod = "";
         this.responsed = false;
-        this.sendFun = sendFun;
     }
     RpcUser.prototype.send = function (rpcResponse) {
-        if (this.rpcRequest instanceof RpcRequest_1.default && !this.responsed) {
+        if (this.sendFun && !this.responsed) {
             this.responsed = true;
-            if (!rpcResponse.id) {
-                rpcResponse.id = this.rpcRequest.id;
-            }
+            rpcResponse.id = this.requestId;
             this.sendFun(rpcResponse);
         }
     };
@@ -69,41 +66,18 @@ var RpcUser = /** @class */ (function () {
         response.error = error;
         this.send(response);
     };
-    RpcUser.prototype.parseMessage = function (msg) {
-        var id = msg.id;
-        var method = msg.method;
-        var params = msg.params;
-        if (id) {
-        }
-        else {
-        }
-    };
-    RpcUser.prototype.on = function (msg) {
-        return __awaiter(this, void 0, void 0, function () {
-            var id, method, params;
-            return __generator(this, function (_a) {
-                try {
-                    id = msg.id;
-                    method = msg.method;
-                    params = msg.params;
-                    if (id) {
-                    }
-                }
-                catch (e) {
-                }
-                return [2 /*return*/];
-            });
-        });
-    };
-    RpcUser.prototype.call = function (rpcRequest) {
+    RpcUser.prototype.call = function (rpcRequest, send) {
         return __awaiter(this, void 0, void 0, function () {
             var result, e_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        this.rpcRequest = rpcRequest;
-                        return [4 /*yield*/, ActionController_1.default.requestAction(rpcRequest.method, rpcRequest.params, this)];
+                        this.sendFun = send;
+                        this.requestMethod = rpcRequest.method;
+                        this.requestParams = rpcRequest.params;
+                        this.requestId = rpcRequest.id;
+                        return [4 /*yield*/, RpcController_1.default.requestAction(rpcRequest.method, rpcRequest.params, this)];
                     case 1:
                         result = _a.sent();
                         if (result) {
@@ -134,8 +108,9 @@ var RpcUser = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        this.rpcRequest = rpcNotice;
-                        return [4 /*yield*/, ActionController_1.default.requestAction(rpcNotice.method, rpcNotice.params, this)];
+                        this.requestMethod = rpcNotice.method;
+                        this.requestParams = rpcNotice.params;
+                        return [4 /*yield*/, RpcController_1.default.requestAction(rpcNotice.method, rpcNotice.params, this)];
                     case 1:
                         _a.sent();
                         return [3 /*break*/, 3];

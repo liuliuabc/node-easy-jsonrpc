@@ -1,4 +1,7 @@
-import RpcUser from "./model/RpcUser";
+import RpcUser from "./RpcUser";
+import RpcNotice from "./RpcNotice";
+import RpcRequest from "./RpcRequest";
+import RpcResponse from "./RpcResponse";
 export declare type ActionFunStruct = (params: any, rpcUser: RpcUser) => any;
 declare class ActionRuleBase {
     rules: Map<string, ActionFunStruct>;
@@ -8,23 +11,25 @@ declare class ActionRuleBase {
     addRule(name: string, fun: ActionFunStruct): void;
     doVerifyRules(params: any, user: RpcUser): Promise<void>;
 }
-declare class ActionController extends ActionRuleBase {
+declare class RpcController extends ActionRuleBase {
     controllerMap: Map<string, Controller>;
     id: any;
+    call(req: RpcRequest, send: (data: RpcResponse) => any): Promise<void>;
+    notify(req: RpcNotice): Promise<void>;
     init(actionPath: any, paramSchema?: object | null | "number" | "boolean" | "string"): void;
     private bindPath;
     private bindPaths;
     requestAction(method: string, params: any, user: RpcUser): Promise<any>;
     controller(name: string, paramType?: object | null | "number" | "boolean" | "string"): Controller;
 }
-declare const _default: ActionController;
+declare const _default: RpcController;
 export default _default;
 declare class Controller extends ActionRuleBase {
     actionMap: Map<any, any>;
     name: string;
     id: any;
-    ac: ActionController;
-    constructor(name: string, ac: ActionController);
+    ac: RpcController;
+    constructor(name: string, ac: RpcController);
     onIndexAction(actionFun: ActionFunStruct): Action;
     onAction(actionName: string, actionFun: ActionFunStruct): Action;
     addAcRule(name: string): this;

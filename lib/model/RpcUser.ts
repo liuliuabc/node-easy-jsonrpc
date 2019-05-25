@@ -1,22 +1,19 @@
 import RpcResponse from "./RpcResponse";
 import RpcRequest from "./RpcRequest";
 import RpcInfo from "./RpcInfo";
-import ActionController from "../ActionController";
+import RpcController from "./RpcController";
 import RpcNotice from "./RpcNotice";
 import RpcError from "./RpcError";
 export default class RpcUser {
-  public rpcRequest?: RpcRequest | RpcNotice;
-  private sendFun: (res: RpcResponse) => any;
+  public requestMethod: string="";
+  public requestParams: any;
+  private requestId: any;
+  private sendFun?: (res: RpcResponse) => any;
   private responsed: boolean = false;
-  constructor(sendFun: (res: RpcResponse) => any) {
-    this.sendFun = sendFun;
-  }
   public send(rpcResponse: RpcResponse) {
-    if (this.rpcRequest instanceof RpcRequest && !this.responsed) {
+    if (this.sendFun&& !this.responsed) {
       this.responsed = true;
-      if (!rpcResponse.id) {
-        rpcResponse.id = this.rpcRequest.id;
-      }
+      rpcResponse.id = this.requestId;
       this.sendFun(rpcResponse);
     }
   }
@@ -30,32 +27,13 @@ export default class RpcUser {
     response.error = error;
     this.send(response);
   }
-  public  parseMessage(msg: any) {
-      const id=msg.id;
-      const method=msg.method;
-      const params=msg.params;
-      if(id){
-
-      }else{
-
-      }
-
-  }
-  public async on(msg: any) {
+  public async call(rpcRequest: RpcRequest,send:(data:RpcResponse)=>any) {
     try {
-     const id=msg.id;
-     const method=msg.method;
-     const params=msg.params;
-     if(id){
-
-     }
-    }catch (e){
-    }
-  }
-  public async call(rpcRequest: RpcRequest) {
-    try {
-      this.rpcRequest = rpcRequest;
-      const result = await ActionController.requestAction(rpcRequest.method, rpcRequest.params, this);
+      this.sendFun = send;
+      this.requestMethod = rpcRequest.method;
+      this.requestParams = rpcRequest.params;
+      this.requestId = rpcRequest.id;
+      const result = await RpcController.requestAction(rpcRequest.method, rpcRequest.params, this);
       if (result){
         this.success(result);
       } else {
@@ -71,8 +49,9 @@ export default class RpcUser {
   }
   public async notify(rpcNotice: RpcNotice) {
     try {
-      this.rpcRequest = rpcNotice;
-      await ActionController.requestAction(rpcNotice.method, rpcNotice.params, this);
+      this.requestMethod = rpcNotice.method;
+      this.requestParams = rpcNotice.params;
+      await RpcController.requestAction(rpcNotice.method, rpcNotice.params, this);
     } catch (e) {
     }
   }

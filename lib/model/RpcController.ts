@@ -1,26 +1,34 @@
-import RpcError from "./model/RpcError";
-import RpcUser from "./model/RpcUser";
+import RpcError from "./RpcError";
+import RpcUser from "./RpcUser";
 import fs from "fs";
 import path from "path";
-//import {uuid} from "../util/CommonUtil";
+import RpcNotice from "./RpcNotice";
+import RpcRequest from "./RpcRequest";
+import RpcResponse from "./RpcResponse";
+
 export type ActionFunStruct = (params: any, rpcUser: RpcUser) => any;
+
 function uuid() {
-  return new Date().getTime()+Math.ceil(Math.random()*20000)+Math.ceil(Math.random()*20000);
+  return new Date().getTime() + Math.ceil(Math.random() * 20000) + Math.ceil(Math.random() * 20000);
 }
+
 class ActionRuleBase {
   public rules = new Map<string, ActionFunStruct>();
-  public paramSchema: object | null | "number"  | "boolean" | "string"= null;
-  public setParamSchema(schema: object | null | "number"  | "boolean" |  "string" ) {
+  public paramSchema: object | null | "number" | "boolean" | "string" = null;
+
+  public setParamSchema(schema: object | null | "number" | "boolean" | "string") {
     paramValidator.validateSchemaRule(schema);
     this.paramSchema = schema;
   }
+
   public cloneRules(keyAlias: string) {
     const cloneMap = new Map();
-    for(const [key, fun] of this.rules) {
+    for (const [key, fun] of this.rules) {
       cloneMap.set(keyAlias + key, fun);
     }
     return cloneMap;
   }
+
   public addRule(name: string, fun: ActionFunStruct) {
     this.rules.set(name, fun);
   }
@@ -32,11 +40,17 @@ class ActionRuleBase {
   }
 }
 
-class ActionController extends ActionRuleBase {
+class RpcController extends ActionRuleBase {
   public controllerMap = new Map<string, Controller>();
   public id: any = uuid();
+  public call(req: RpcRequest, send: (data: RpcResponse) => any){
+    return new RpcUser().call(req,send);
+  }
+  public notify(req: RpcNotice){
+    return new RpcUser().notify(req);
+  }
   public init(actionPath: any, paramSchema: object | null | "number" |
-    "boolean" |  "string" = null) {
+    "boolean" | "string" = null) {
     if (actionPath instanceof Array) {
       this.bindPaths(actionPath);
     } else {
@@ -110,15 +124,15 @@ class ActionController extends ActionRuleBase {
   }
 }
 
-export default new ActionController();
+export default new RpcController();
 
 class Controller extends ActionRuleBase {
   public actionMap = new Map();
   public name: string;
   public id: any = uuid();
-  public ac: ActionController;
+  public ac: RpcController;
 
-  constructor(name: string, ac: ActionController) {
+  constructor(name: string, ac: RpcController) {
     super();
     this.name = name;
     this.ac = ac;
@@ -167,6 +181,7 @@ class Controller extends ActionRuleBase {
 class Action extends ActionRuleBase {
   public actionFun: ActionFunStruct;
   public controller: Controller;
+
   constructor(actionFun: ActionFunStruct, controller: Controller) {
     super();
     this.actionFun = actionFun;
@@ -210,8 +225,10 @@ class Action extends ActionRuleBase {
     return await this.actionFun(params, user);
   }
 }
+
 class ParamValidator {
   public cutors = ["delete", "string", "boolean", "number"];
+
   public validateSchemaRule(schemaJson: any) {
     if (schemaJson instanceof Array) {
       for (const schema of schemaJson) {
@@ -230,8 +247,9 @@ class ParamValidator {
       }
     }
   }
+
   public validate(schema: any, value: any, valueKey?: string, valueParent?: any) {
-    if (!schema){
+    if (!schema) {
       return;
     }
     if (typeof schema === "string") {
@@ -265,4 +283,5 @@ class ParamValidator {
     }
   }
 }
+
 const paramValidator = new ParamValidator();

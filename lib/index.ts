@@ -1,7 +1,12 @@
-import ActionController  from "./ActionController"
-export default ActionController;
-export const  RpcUser=require("./model/RpcUser");
-export const  RpcRequest=require("./model/RpcRequest");
-export const  RpcNotice=require("./model/RpcNotice");
-export const  RpcError=require("./model/RpcError");
-export const  RpcResponse=require("./model/RpcResponse");
+import RpcController from "./model/RpcController";
+import RpcUserClass from "./model/RpcUser";
+import RpcErrorClass from "./model/RpcError";
+import RpcRequestClass from "./model/RpcRequest";
+import RpcResponseClass from "./model/RpcResponse";
+import RpcNoticeClass from "./model/RpcNotice";
+export default RpcController;
+export class RpcUser extends RpcUserClass{}
+export class RpcError extends RpcErrorClass{}
+export class RpcRequest extends RpcRequestClass{}
+export class RpcResponse extends RpcResponseClass{}
+export class RpcNotice extends RpcNoticeClass{}

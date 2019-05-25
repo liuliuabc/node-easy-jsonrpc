@@ -5,7 +5,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -77,7 +77,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var RpcError_1 = __importDefault(require("./model/RpcError"));
+var RpcError_1 = __importDefault(require("./RpcError"));
+var RpcUser_1 = __importDefault(require("./RpcUser"));
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
 function uuid() {
@@ -150,15 +151,21 @@ var ActionRuleBase = /** @class */ (function () {
     };
     return ActionRuleBase;
 }());
-var ActionController = /** @class */ (function (_super) {
-    __extends(ActionController, _super);
-    function ActionController() {
+var RpcController = /** @class */ (function (_super) {
+    __extends(RpcController, _super);
+    function RpcController() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.controllerMap = new Map();
         _this.id = uuid();
         return _this;
     }
-    ActionController.prototype.init = function (actionPath, paramSchema) {
+    RpcController.prototype.call = function (req, send) {
+        return new RpcUser_1.default().call(req, send);
+    };
+    RpcController.prototype.notify = function (req) {
+        return new RpcUser_1.default().notify(req);
+    };
+    RpcController.prototype.init = function (actionPath, paramSchema) {
         if (paramSchema === void 0) { paramSchema = null; }
         if (actionPath instanceof Array) {
             this.bindPaths(actionPath);
@@ -168,7 +175,7 @@ var ActionController = /** @class */ (function (_super) {
         }
         this.setParamSchema(paramSchema);
     };
-    ActionController.prototype.bindPath = function (actionPath) {
+    RpcController.prototype.bindPath = function (actionPath) {
         var e_3, _a;
         //放在上面会造成互相引用导致问题
         var fileNames = fs_1.default.readdirSync(actionPath);
@@ -193,7 +200,7 @@ var ActionController = /** @class */ (function (_super) {
             finally { if (e_3) throw e_3.error; }
         }
     };
-    ActionController.prototype.bindPaths = function (actionPaths) {
+    RpcController.prototype.bindPaths = function (actionPaths) {
         var e_4, _a;
         try {
             for (var actionPaths_1 = __values(actionPaths), actionPaths_1_1 = actionPaths_1.next(); !actionPaths_1_1.done; actionPaths_1_1 = actionPaths_1.next()) {
@@ -209,7 +216,7 @@ var ActionController = /** @class */ (function (_super) {
             finally { if (e_4) throw e_4.error; }
         }
     };
-    ActionController.prototype.requestAction = function (method, params, user) {
+    RpcController.prototype.requestAction = function (method, params, user) {
         if (!method) {
             throw RpcError_1.default.MethodNotFound;
         }
@@ -238,7 +245,7 @@ var ActionController = /** @class */ (function (_super) {
             throw RpcError_1.default.MethodNotFound;
         }
     };
-    ActionController.prototype.controller = function (name, paramType) {
+    RpcController.prototype.controller = function (name, paramType) {
         name = name.toLowerCase();
         var controller = this.controllerMap.get(name);
         if (!controller) {
@@ -253,9 +260,9 @@ var ActionController = /** @class */ (function (_super) {
         }
         return controller;
     };
-    return ActionController;
+    return RpcController;
 }(ActionRuleBase));
-exports.default = new ActionController();
+exports.default = new RpcController();
 var Controller = /** @class */ (function (_super) {
     __extends(Controller, _super);
     function Controller(name, ac) {
