@@ -39,8 +39,8 @@ export default class RpcUser {
       } else {
         this.error(RpcInfo.NoResponse);
       }
-    } catch (e) {
-      if (e instanceof RpcError) {
+    } catch (e){
+      if (e instanceof RpcError){
         this.error(e);
       } else {
         this.error();
