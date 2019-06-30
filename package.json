@@ -1,6 +1,6 @@
 {
   "name": "node-easy-jsonrpc",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "兼容http和websocket的jsonrpc库",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

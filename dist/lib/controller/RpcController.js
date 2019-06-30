@@ -84,7 +84,7 @@ class RpcController {
         }
         else {
             const methodTypes = method.methodTypes ? method.methodTypes : controller.methodTypes;
-            if (methodTypes.indexOf(MethodType_1.default.All) >= 0
+            if (!methodTypes || methodTypes.indexOf(MethodType_1.default.All) >= 0
                 || methodTypes.indexOf(methodType) >= 0) {
                 return this.invokeMethod(controller, method, params, user);
             }

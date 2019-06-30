@@ -78,7 +78,7 @@ export default class RpcController {
       throw RpcError.MethodNotFound;
     } else {
       const methodTypes = method.methodTypes ? method.methodTypes : controller.methodTypes;
-      if (methodTypes.indexOf(MethodType.All) >= 0
+      if (!methodTypes||methodTypes.indexOf(MethodType.All) >= 0
         || methodTypes.indexOf(methodType) >= 0) {
         return this.invokeMethod(controller, method, params, user);
       } else {
