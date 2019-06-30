@@ -24,44 +24,34 @@ try {
 
 ### action文件编写
 ```javascript
-import RpcControllerBack from "node-easy-jsonrpc";
-import {RpcError, RpcUser} from "node-easy-jsonrpc";
-const controller = RpcControllerBack.controller("test");
-controller.addRule("auth", (params) => { //添加该路由文件下的全局rule
-  if (params.password !== "123") {
-    throw RpcError.InvalidRequest;
+import {Controller, CanNull, RpcUser, Action, Index, Default, RpcError} from "node-easy-jsonrpc";
+//注解不传参数就以类名或方法名为标准
+@Controller()
+@CanNull(true)
+export default class Pay {
+  @Index
+  public welcome(@CanNull()  name: string, age: number, user: RpcUser) {
+    return "welcome to pay index";
   }
-});
-controller.onIndexAction((params) => {
-  return "welcome to index";
-});
-controller.onAction("method1", async (params: any, user: RpcUser) => {
-  return true;
-});
-controller.onAction("method2", async (params: any, user: RpcUser) => {
-  return "haha";
-}).offCRule("auth");//该方法不经过取消该路由文件下的全局rule auth
-controller.onAction("method3", async (params: any, user: RpcUser) => {
-  throw new RpcError("you are a big");
-});
-controller.onAction("method4", async (params: any, user: RpcUser) => {
-  user.success({name: "da ming"});
-});
-controller.onAction("method5", async (params: any, user: RpcUser) => {
-  return params;
-}).setParamSchema({
-  name: "string",
-  father: {name: "string", age: "delete"},
-  age: "number",
-  money: "delete"
-});//参数校验 string|number|boolean|{}|[]|delete  ,delete代表删除该参数
 
-controller.onAction("method6", async (params: any, user: RpcUser) => {
-  return params;
-}).setParamSchema([]);//params是数组
-controller.onAction("method7", async (params: any, user: RpcUser) => {
-  return params;
-}).setParamSchema(["number"]);//params是数组，并且数组内容是数字
+  @Default
+  public defaultAction() {
+    throw RpcError.MethodNotFound;
+  }
+
+  @Action("testabc")
+  public async test(@CanNull(false) name: string, age: number, user: RpcUser) {
+    return user.request;
+  }
+
+  @Action()
+  public test2(name: string, age: number, user: RpcUser) {
+    if (name !== "lll") {
+      throw RpcError.InvalidRequest;
+    }
+  }
+}
+
 
 ```
 
@@ -70,30 +60,29 @@ controller.onAction("method7", async (params: any, user: RpcUser) => {
 ```javascript
   //http使用,以express框架为示例
   import {NextFunction, Request, Response} from "express";
-  import {uuid} from "../util/CommonUtil";
-  import RpcControllerBack, {RpcRequest, RpcResponse, RpcUser} from "node-easy-jsonrpc";
-
+  import {RpcRequest,MethodType,RpcUser,RpcResponse} from "node-easy-jsonrpc";
   const express = require("express");
   const router = express.Router();
   router.all("/", (req: Request, res: Response, next: NextFunction) => {
-    const method = req.baseUrl;
-    const params = Object.keys(req.query).length > 0 ? req.query : req.body;
-    const request = new RpcRequest(uuid(), method, params);
-    RpcControllerBack.call(request, (res: RpcResponse) => {
-      res.json(res);
-    });
+    const body = Object.keys(req.query).length > 0 ? req.query : req.body;
+    const requestType=req.method==="POST"?MethodType.Post:MethodType.Get;
+    const request = new RpcRequest(body.id, body.method, body.params,requestType);
+    new RpcUser((data: RpcResponse) => {
+      res.json(data);
+    }).call(request);
   });
   module.exports = router;
+
 
   //websocket,以ws框架为示例
   const server = new WebSocket.Server({port: 8080});
     server.on("connection", async (ws: WebSocket, req: IncomingMessage) => {
       ws.on("message", (msg: string) => {
          const msgJson=JSON.parse(msg);
-         const rpcRequest=new RpcRequest(msgJson.id,msgJson.method,msgJson.params);
-         RpcControllerBack.call(request, (res: RpcResponse) => {
-              ws.send(JSON.stringfy(res));
-         });
+         const request=new RpcRequest(msgJson.id,msgJson.method,msgJson.params,MethodType.Ws);
+         new RpcUser((data: RpcResponse) => {
+               ws.send(JSON.stringfy(res));
+             }).call(request);
       });
     });
 

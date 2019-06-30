@@ -5,5 +5,6 @@ declare const _default: {
     Put: string;
     Delete: string;
     All: string;
+    Ws: string;
 };
 export default _default;

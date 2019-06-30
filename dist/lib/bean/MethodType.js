@@ -6,5 +6,6 @@ exports.default = {
     Patch: "Patch",
     Put: "Put",
     Delete: "Delete",
-    All: "All"
+    All: "All",
+    Ws: "Ws"
 };
