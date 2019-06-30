@@ -136,9 +136,9 @@ export default class RpcController {
       }
     }
     if (!method.paramNames) {
-      const mstr = method.toString();
-      const paramStrs=method.paramNames = mstr.substring(mstr.indexOf("(") + 1,
-        mstr.indexOf(")")).replace(/ /g, "");
+      const funStr = method.toString();
+      const paramStrs=funStr.substring(funStr.indexOf("(") + 1,
+        funStr.indexOf(")")).replace(/ /g, "");
       if(paramStrs){
         method.paramNames = paramStrs.split(",");
       }else{
