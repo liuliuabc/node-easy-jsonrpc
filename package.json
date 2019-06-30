@@ -23,7 +23,9 @@
     "url": "https://github.com/liuliuabc/node-easy-jsonrpc/issues"
   },
   "homepage": "https://github.com/liuliuabc/node-easy-jsonrpc#readme",
-  "dependencies": {},
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
+  },
   "devDependencies": {
     "@types/node": "^10.12.10",
     "typescript": "^3.3.3333"

@@ -24,9 +24,9 @@ try {
 
 ### action文件编写
 ```javascript
-import RpcController from "node-easy-jsonrpc";
+import RpcControllerBack from "node-easy-jsonrpc";
 import {RpcError, RpcUser} from "node-easy-jsonrpc";
-const controller = RpcController.controller("test");
+const controller = RpcControllerBack.controller("test");
 controller.addRule("auth", (params) => { //添加该路由文件下的全局rule
   if (params.password !== "123") {
     throw RpcError.InvalidRequest;
@@ -71,7 +71,7 @@ controller.onAction("method7", async (params: any, user: RpcUser) => {
   //http使用,以express框架为示例
   import {NextFunction, Request, Response} from "express";
   import {uuid} from "../util/CommonUtil";
-  import RpcController, {RpcRequest, RpcResponse, RpcUser} from "node-easy-jsonrpc";
+  import RpcControllerBack, {RpcRequest, RpcResponse, RpcUser} from "node-easy-jsonrpc";
 
   const express = require("express");
   const router = express.Router();
@@ -79,7 +79,7 @@ controller.onAction("method7", async (params: any, user: RpcUser) => {
     const method = req.baseUrl;
     const params = Object.keys(req.query).length > 0 ? req.query : req.body;
     const request = new RpcRequest(uuid(), method, params);
-    RpcController.call(request, (res: RpcResponse) => {
+    RpcControllerBack.call(request, (res: RpcResponse) => {
       res.json(res);
     });
   });
@@ -91,7 +91,7 @@ controller.onAction("method7", async (params: any, user: RpcUser) => {
       ws.on("message", (msg: string) => {
          const msgJson=JSON.parse(msg);
          const rpcRequest=new RpcRequest(msgJson.id,msgJson.method,msgJson.params);
-         RpcController.call(request, (res: RpcResponse) => {
+         RpcControllerBack.call(request, (res: RpcResponse) => {
               ws.send(JSON.stringfy(res));
          });
       });
